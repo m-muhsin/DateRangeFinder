@@ -2,19 +2,31 @@ package com.mtwo.daterangefinder;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    DateRange dateRange;
+    private DateRange dateRange;
     Button btnCalculate;
     TextView txtFromDate, txtToDate, txtNoOfDays;
 
@@ -23,9 +35,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dateRange = new DateRange();
+        // find the retained fragment on activity restarts
+        FragmentManager fm = getFragmentManager();
+        dateRange = (DateRange) fm.findFragmentByTag("dateRange");
+
+        // create the fragment and data the first time
+        if (dateRange == null) {
+
+            dateRange = new DateRange();
+            fm.beginTransaction().add(dateRange, "dateRange").commit();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM//dd");
+            Calendar calFrom = Calendar.getInstance();
+            Calendar calTo = Calendar.getInstance();
+
+            try {
+
+                calFrom.setTime(sdf.parse((String) txtFromDate.getText()));
+                calTo.setTime(sdf.parse((String) txtToDate.getText()));
+                dateRange.setFromDate(calFrom);
+                dateRange.setToDate(calTo);
+
+            } catch (ParseException | NullPointerException e) {}
+        }
+
         showDialogOnTextEdit();
         startListener(dateRange);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void startListener(final DateRange dateRange) {
@@ -109,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         if(id == DateRange.FROM_DIALOG_ID)
-            return new DatePickerDialog(this, fromDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
+            return new DatePickerDialog(this, fromDatePickerListener, dateRange.year_x, dateRange.month_x, dateRange.day_x);
 
         if(id == DateRange.TO_DIALOG_ID)
-            return new DatePickerDialog(this, toDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
+            return new DatePickerDialog(this, toDatePickerListener, dateRange.year_x, dateRange.month_x, dateRange.day_x);
 
         return null;
     }
