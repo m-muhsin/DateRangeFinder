@@ -2,32 +2,20 @@ package com.mtwo.daterangefinder;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    DateRange dateRange;
     Button btnCalculate;
-    int year_x, month_x, day_x;
-    Calendar fromDate, toDate;
-    long dateDifference;
-    static final int FROM_DIALOG_ID = 0;
-    static final int TO_DIALOG_ID = 1;
     TextView txtFromDate, txtToDate, txtNoOfDays;
 
     @Override
@@ -35,40 +23,30 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Calendar calendar = Calendar.getInstance();
-        year_x = calendar.get(Calendar.YEAR);
-        month_x = calendar.get(Calendar.MONTH);
-        day_x = calendar.get(Calendar.DAY_OF_MONTH);
-
-        showFromDialogOnTextEdit();
-        showToDialogOnTextEdit();
-
-        doCalculation();
-
+        dateRange = new DateRange();
+        showDialogOnTextEdit();
+        startListener(dateRange);
     }
 
-    private void doCalculation() {
+    private void startListener(final DateRange dateRange) {
         txtNoOfDays = (TextView) findViewById(R.id.txtNoOfDays);
-
         btnCalculate = (Button) findViewById(R.id.btnCalculate);
+
         btnCalculate.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        if(toDate == null || fromDate == null)
+                        if(dateRange.getFromDate() == null || dateRange.getToDate() == null)
                             Snackbar.make(txtNoOfDays, "Please select From and To dates", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         else {
-                            dateDifference = toDate.getTimeInMillis() - fromDate.getTimeInMillis();
-                            dateDifference = dateDifference / (24 * 60 * 60 * 1000);
-                            String noOfDays = String.valueOf(dateDifference);
-                            txtNoOfDays.setText(noOfDays);
+                            txtNoOfDays.setText(dateRange.doCalculation());
                         }
                     }
                 }
         );
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,25 +70,23 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showFromDialogOnTextEdit() {
+    public void showDialogOnTextEdit() {
         txtFromDate = (TextView) findViewById(R.id.txtFromDate);
         txtFromDate.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(FROM_DIALOG_ID);
+                        showDialog(DateRange.FROM_DIALOG_ID);
                     }
                 }
         );
-    }
 
-    public void showToDialogOnTextEdit() {
         txtToDate = (TextView) findViewById(R.id.txtToDate);
         txtToDate.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(TO_DIALOG_ID);
+                        showDialog(DateRange.TO_DIALOG_ID);
                     }
                 }
         );
@@ -119,36 +95,24 @@ public class MainActivity extends AppCompatActivity {
     private DatePickerDialog.OnDateSetListener fromDatePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-            fromDate = Calendar.getInstance();
-            fromDate.set(Calendar.YEAR, year);
-            fromDate.set(Calendar.MONTH, monthOfYear);
-            fromDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-            txtFromDate.setText(year + "/" + (monthOfYear + 1) + "/" + dayOfMonth);
+            txtFromDate.setText(dateRange.setFromDate(year, monthOfYear, dayOfMonth));
         }
     };
 
     private DatePickerDialog.OnDateSetListener toDatePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-            toDate = Calendar.getInstance();
-            toDate.set(Calendar.YEAR, year);
-            toDate.set(Calendar.MONTH, monthOfYear);
-            toDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-            txtToDate.setText(year + "/" + (monthOfYear + 1) + "/" + dayOfMonth);
+            txtToDate.setText(dateRange.setToDate(year, monthOfYear, dayOfMonth));
         }
     };
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        if(id == FROM_DIALOG_ID)
-            return new DatePickerDialog(this, fromDatePickerListener, year_x, month_x, day_x);
+        if(id == DateRange.FROM_DIALOG_ID)
+            return new DatePickerDialog(this, fromDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
 
-        if(id == TO_DIALOG_ID)
-            return new DatePickerDialog(this, toDatePickerListener, year_x, month_x, day_x);
+        if(id == DateRange.TO_DIALOG_ID)
+            return new DatePickerDialog(this, toDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
 
         return null;
     }
