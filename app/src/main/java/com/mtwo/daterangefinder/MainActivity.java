@@ -149,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         if(id == DateRange.FROM_DIALOG_ID)
-            return new DatePickerDialog(this, fromDatePickerListener, dateRange.year_x, dateRange.month_x, dateRange.day_x);
+            return new DatePickerDialog(this, fromDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
 
         if(id == DateRange.TO_DIALOG_ID)
-            return new DatePickerDialog(this, toDatePickerListener, dateRange.year_x, dateRange.month_x, dateRange.day_x);
+            return new DatePickerDialog(this, toDatePickerListener, dateRange.getYear_x(), dateRange.getMonth_x(), dateRange.getDay_x());
 
         return null;
     }

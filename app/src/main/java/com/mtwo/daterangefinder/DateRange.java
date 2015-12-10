@@ -10,7 +10,9 @@ import java.util.Calendar;
  */
 public class DateRange extends Fragment {
 
-    protected int year_x, month_x, day_x;
+    private int year_x;
+    private int month_x;
+    private int day_x;
     private Calendar fromDate;
     private Calendar toDate;
     private long dateDifference;
@@ -24,7 +26,6 @@ public class DateRange extends Fragment {
         setRetainInstance(true);
     }
 
-
     public DateRange() {
         final Calendar calendar = Calendar.getInstance();
         year_x = calendar.get(Calendar.YEAR);
@@ -36,27 +37,38 @@ public class DateRange extends Fragment {
         dateDifference = getToDate().getTimeInMillis() - getFromDate().getTimeInMillis();
         dateDifference = dateDifference / (24 * 60 * 60 * 1000);
         String noOfDays = String.valueOf(dateDifference);
-        return  noOfDays;
+        return noOfDays;
+    }
+    public int getYear_x() {
+        return year_x;
     }
 
-    public Calendar getFromDate() {
-        return fromDate;
+    public int getMonth_x() {
+        return month_x;
     }
+
+    public int getDay_x() {
+        return day_x;
+    }
+
 
     public void setFromDate(Calendar fromDate) {
         this.fromDate = fromDate;
+    }
+
+    public void setToDate(Calendar toDate) {
+        this.toDate = toDate;
+    }
+    public Calendar getFromDate() {
+        return fromDate;
     }
 
     public Calendar getToDate() {
         return toDate;
     }
 
-    public void setToDate(Calendar toDate) {
-        this.toDate = toDate;
-    }
-
     public String setFromDate(int year, int monthOfYear, int dayOfMonth) {
-        setFromDate(Calendar.getInstance());
+        setFromDate(initCalendar());
         getFromDate().set(Calendar.YEAR, year);
         getFromDate().set(Calendar.MONTH, monthOfYear);
         getFromDate().set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -64,11 +76,19 @@ public class DateRange extends Fragment {
     }
 
     public String setToDate(int year, int monthOfYear, int dayOfMonth) {
-        setToDate(Calendar.getInstance());
+        setToDate(initCalendar());
         getToDate().set(Calendar.YEAR, year);
         getToDate().set(Calendar.MONTH, monthOfYear);
         getToDate().set(Calendar.DAY_OF_MONTH, dayOfMonth);
         return (year + "/" + (monthOfYear + 1) + "/" + dayOfMonth);
     }
 
+    private Calendar initCalendar() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
 }
